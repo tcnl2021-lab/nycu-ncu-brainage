@@ -1,0 +1,9 @@
+# SHA-256 of (subject_id, fold_id) pairs in cache row order.
+# Source cache: codes/brain_age_2026/tuning/cache/brain_age_cache.npz
+# Source IDs : Data/DATA_ses-01_cleaned.csv (drop NaN BASIC_INFO_AGE, reset_index)
+# Canonical recipe:
+#   buf = '\n'.join(f'{sid}\t{int(fid)}' for sid, fid in zip(subject_ids, fold_ids)) + '\n'
+#   sha256(buf.encode('utf-8'))
+# n_subjects : 427
+# fold counts: [86, 86, 85, 85, 85]
+db1510dd5442d4492955579dee406c6dd7be8feabea80d929672b2dc0f5b5a6d
