@@ -1,0 +1,18 @@
+name: nytu-ncu-brainage
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.9
+  - numpy=1.26.3
+  - pandas=2.2.0
+  - scipy=1.12.0
+  - scikit-learn=1.4.0
+  - matplotlib=3.8.2
+  - pyyaml=6.0.1
+  - pip=24.0
+  - pip:
+    # Add any additional pip packages if needed
+    # - package_name==1.0.0
+
+# Created for NYTU-NCU brain-age manuscript analysis
+# Pin versions to ensure reproducible results across systems

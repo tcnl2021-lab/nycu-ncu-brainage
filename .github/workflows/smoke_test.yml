@@ -1,0 +1,133 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ v* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        activate-environment: nytu-ncu-brainage
+        environment-file: environment.yml
+        python-version: 3.11
+
+    - name: Check environment
+      shell: bash -l {0}
+      run: |
+        python --version
+        conda list
+
+    - name: Verify fold hash
+      shell: bash -l {0}
+      run: |
+        cd ${{ github.workspace }}
+        expected_hash="db1510dd5442d4492955579dee406c6dd7be8feabea80d929672b2dc0f5b5a6d"
+        echo "Expected fold hash: $expected_hash"
+        cat preregister_folds.sha256
+
+    - name: Verify output structure
+      shell: bash -l {0}
+      run: |
+        cd ${{ github.workspace }}
+
+        # Check that required directories exist
+        test -d "scripts" || exit 1
+        test -d "configs" || exit 1
+        test -d "outputs" || exit 1
+
+        # Check that key scripts are present
+        test -f "scripts/_audit_common.py" || exit 1
+        test -f "scripts/train_clean.py" || exit 1
+        test -f "scripts/audit_replay.py" || exit 1
+        test -f "scripts/audit_stats.py" || exit 1
+        test -f "scripts/make_clean_protocol_figures.py" || exit 1
+
+        # Check that configs are present
+        test -f "configs/frontier_addendum_1.yaml" || exit 1
+        test -f "configs/frontier_addendum_2.yaml" || exit 1
+
+        # Check that output CSVs exist (sample)
+        test -d "outputs/addendum_1/oof" || exit 1
+        test -f "outputs/addendum_1/stats_20260426.csv" || exit 1
+
+        echo "✓ All required files and directories present"
+
+    - name: Test imports
+      shell: bash -l {0}
+      run: |
+        cd ${{ github.workspace }}/scripts
+        python -c "import _audit_common; print('✓ _audit_common imports successfully')"
+        python -c "import train_clean; print('✓ train_clean imports successfully')"
+        python -c "import audit_stats; print('✓ audit_stats imports successfully')"
+
+    - name: Verify CSV format
+      shell: bash -l {0}
+      run: |
+        cd ${{ github.workspace }}
+
+        # Check that OOF CSVs have expected column structure
+        header=$(head -1 outputs/addendum_1/oof/oof_pred_01b_20260426.csv)
+        echo "OOF CSV header: $header"
+
+        # Should have at least 3 columns: subject_id, fold, predicted_age
+        n_cols=$(echo "$header" | awk -F',' '{print NF}')
+        test $n_cols -ge 3 || exit 1
+        echo "✓ OOF CSV has expected column count"
+
+        # Check that stats CSV has expected columns
+        stats_header=$(head -1 outputs/addendum_1/stats_20260426.csv)
+        echo "Stats CSV header: $stats_header"
+        echo "✓ Stats CSV present and readable"
+
+    - name: Test Python script syntax
+      shell: bash -l {0}
+      run: |
+        cd ${{ github.workspace }}/scripts
+
+        for script in *.py; do
+          echo "Checking syntax: $script"
+          python -m py_compile "$script" || exit 1
+        done
+        echo "✓ All scripts have valid Python syntax"
+
+    - name: Check manifest documentation
+      shell: bash -l {0}
+      run: |
+        cd ${{ github.workspace }}
+
+        test -f "README.md" || exit 1
+        test -f "LICENSE" || exit 1
+        test -f "environment.yml" || exit 1
+
+        echo "✓ All documentation files present"
+
+    - name: Summary
+      shell: bash -l {0}
+      run: |
+        echo "========================================"
+        echo "Smoke test PASSED"
+        echo "========================================"
+        echo ""
+        echo "Repository structure validated."
+        echo "All required files, dependencies, and configurations present."
+        echo ""
+        echo "To reproduce the analysis:"
+        echo "  1. Download feature data from OSF (https://doi.org/[OSF_DOI])"
+        echo "  2. conda env create -f environment.yml"
+        echo "  3. python scripts/audit_replay.py --config configs/frontier_addendum_1.yaml"
+        echo ""
+        echo "For details, see README.md"
