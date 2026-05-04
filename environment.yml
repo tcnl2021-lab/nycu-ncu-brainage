@@ -1,4 +1,4 @@
-name: nytu-ncu-brainage
+name: nycu-ncu-brainage
 channels:
   - conda-forge
 dependencies:
@@ -14,5 +14,5 @@ dependencies:
     # Add any additional pip packages if needed
     # - package_name==1.0.0
 
-# Created for NYTU-NCU brain-age manuscript analysis
+# Created for NYCU-NCU brain-age manuscript analysis
 # Pin versions to ensure reproducible results across systems

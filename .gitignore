@@ -80,6 +80,7 @@ venv.bak/
 data/
 Data/
 *.csv
+!outputs/**/*.csv
 *.npz
 *.npy
 *.parquet

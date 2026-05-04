@@ -1,8 +1,8 @@
-# NYTU-NCU Brain-Age Prediction: Analysis Scripts and Outputs
+# NYCU-NCU Brain-Age Prediction: Analysis Scripts and Outputs
 
 [![DOI](https://zenodo.org/badge/[ZENODO_ID].svg)](https://zenodo.org/badge/latestdoi/[ZENODO_ID])
 
-Analysis pipeline and pre-computed outputs for the NYTU-NCU brain-age prediction study.
+Analysis pipeline and pre-computed outputs for the NYCU-NCU brain-age prediction study.
 
 ## Overview
 
@@ -34,11 +34,11 @@ Download from **OSF** (https://doi.org/[OSF_DOI]):
 ### 2. Set Up Environment
 
 ```bash
-git clone https://github.com/tcnl2021-lab/nytu-ncu-brainage.git
-cd nytu-ncu-brainage
+git clone https://github.com/tcnl2021-lab/nycu-ncu-brainage.git
+cd nycu-ncu-brainage
 
 conda env create -f environment.yml
-conda activate nytu-ncu-brainage
+conda activate nycu-ncu-brainage
 ```
 
 ### 3. Reproduce All Results
@@ -65,7 +65,7 @@ Pre-computed outputs are already in `outputs/` for immediate inspection.
 ## Repository Structure
 
 ```
-nytu-ncu-brainage/
+nycu-ncu-brainage/
 ├── README.md                                    # This file
 ├── LICENSE                                      # MIT
 ├── environment.yml                              # Conda environment (pinned versions)
@@ -381,10 +381,10 @@ If you use these scripts or outputs, please cite:
 }
 
 @software{chang2025brainage_code,
-  title   = {NYTU-NCU brain-age prediction: analysis scripts and outputs},
+  title   = {NYCU-NCU brain-age prediction: analysis scripts and outputs},
   author  = {Chang, E.},
   year    = {2025},
-  url     = {https://github.com/tcnl2021-lab/nytu-ncu-brainage},
+  url     = {https://github.com/tcnl2021-lab/nycu-ncu-brainage},
   doi     = {10.5281/zenodo.[ZENODO_ID]}
 }
 ```
