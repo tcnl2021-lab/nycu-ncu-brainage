@@ -1,0 +1,149 @@
+# Frontier configs for preregister_addendum_2 (filed 2026-04-25).
+# Leave-one-out (LOO) ablation: split MRI and EEG blocks by acquisition-
+# design domain and measure each domain's marginal contribution by
+# REMOVING it from the audit baseline.
+#
+# This is an INTERPRETABILITY ablation, not a §6 information-gain test.
+# Sign convention (audit_stats.py): dMAE_observed = MAE(parent) - MAE(child).
+#   Negative dMAE  => dropping the domain HURT the model
+#                     (i.e., the domain carries unique age signal).
+#   Positive dMAE  => dropping the domain helped (noise/redundancy).
+#   CI includes 0  => domain effect indistinguishable from null at this N.
+#
+# Block vocabulary extended additively (see train_clean.py
+# _MRI_DROP_DOMAINS / _EEG_DROP_DOMAINS — existing block outputs unchanged).
+# Acceptance rule §6 does not apply: "confirmed/fragile/overturned" labels
+# in stats_*.csv reflect the §6 logic against parent, not LOO interpretation.
+# Fold hash unchanged: db1510dd5442d4492955579dee406c6dd7be8feabea80d929672b2dc0f5b5a6d
+#
+# Baseline mirrors addendum_1 01b (BEH, EEG, MRI, DTI_ROI, DL_SFCN,
+# DL_PYMENT, DL_RSFMRI_FC). Each LOO config swaps either MRI or EEG for
+# its drop-one-domain variant.
+
+configs:
+  - id: "00c"
+    name: baseline_full
+    parent: null
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    note: "Baseline (full MRI + full EEG). Same blocks as addendum_1 01b."
+    blocks: [BEH, EEG, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  # ---------------- MRI domain LOO (1266 cols total) -----------------
+  - id: "01c"
+    name: mri_drop_structure
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop STRUCTURE_NULL_MRI_* (684 sMRI cols). MRI -> 582 cols (rest+task-fMRI)."
+    blocks: [BEH, EEG, MRI_drop_structure, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "02c"
+    name: mri_drop_resting
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop RESTING_NULL_MRI_* (374 rs-fMRI metrics: FCD/HRV/etc.). MRI -> 892 cols."
+    blocks: [BEH, EEG, MRI_drop_resting, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "03c"
+    name: mri_drop_motor_gforce
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop MOTOR_GFORCE_MRI_* task-fMRI BETAs (64 cols)."
+    blocks: [BEH, EEG, MRI_drop_motor_gforce, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "04c"
+    name: mri_drop_memory_mst
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop MEMORY_MST_MRI_* task-fMRI BETAs (105 cols)."
+    blocks: [BEH, EEG, MRI_drop_memory_mst, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "05c"
+    name: mri_drop_language_speechcomp
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop LANGUAGE_SPEECHCOMP_MRI_* task-fMRI BETAs (21 cols)."
+    blocks: [BEH, EEG, MRI_drop_language_speechcomp, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "06c"
+    name: mri_drop_language_wordname
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop LANGUAGE_WORDNAME_MRI_* task-fMRI BETAs (18 cols)."
+    blocks: [BEH, EEG, MRI_drop_language_wordname, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "07c"
+    name: mri_drop_task_fmri_all
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop ALL task-fMRI BETAs (208 cols across 4 tasks). Keeps STRUCTURE+RESTING (1058 cols)."
+    blocks: [BEH, EEG, MRI_drop_task_fmri_all, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  # ---------------- EEG domain LOO (509 cols total) ------------------
+  - id: "08c"
+    name: eeg_drop_resting
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop RESTING_NULL_EEG_* (81 rest-EEG: IAF + microstates). EEG -> 428 cols."
+    blocks: [BEH, EEG_drop_resting, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "09c"
+    name: eeg_drop_motor_gofitts
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop MOTOR_GOFITTS_EEG_* (216 task-EEG cols)."
+    blocks: [BEH, EEG_drop_motor_gofitts, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "10c"
+    name: eeg_drop_memory_ospan
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop MEMORY_OSPAN_EEG_* (120 task-EEG cols)."
+    blocks: [BEH, EEG_drop_memory_ospan, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "11c"
+    name: eeg_drop_memory_exclusion
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop MEMORY_EXCLUSION_EEG_* (60 task-EEG cols)."
+    blocks: [BEH, EEG_drop_memory_exclusion, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "12c"
+    name: eeg_drop_motor_bilpress
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop MOTOR_BILPRESS_EEG_* (32 task-EEG cols)."
+    blocks: [BEH, EEG_drop_motor_bilpress, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "13c"
+    name: eeg_drop_task_eeg_all
+    parent: "00c"
+    source_commit: addendum_2
+    pre_audit_val_mae: null
+    no_new_information: true
+    note: "Drop ALL task-EEG (428 cols across 4 tasks). Keeps RESTING_NULL_EEG (81 cols)."
+    blocks: [BEH, EEG_drop_task_eeg_all, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]

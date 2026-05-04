@@ -1,0 +1,48 @@
+# Frontier configs for preregister_addendum_1 (filed 2026-04-25).
+# Promotes DTI_ROI and DL_RSFMRI_FC to the audit baseline (cohort
+# acquisition design). See preregister_addendum_1.md for the rationale.
+#
+# Block vocabulary is unchanged (defined in scripts/train_clean.py).
+# Acceptance rule unchanged (preregister-v1 §6).
+# Fold hash unchanged: db1510dd5442d4492955579dee406c6dd7be8feabea80d929672b2dc0f5b5a6d
+
+configs:
+  - id: "01b"
+    name: baseline_v2
+    parent: null
+    source_commit: addendum_1
+    pre_audit_val_mae: null
+    note: "Baseline aligned with cohort acquisition design (BEH, EEG, sMRI, DTI ROI, DL = SFCN+Pyment, rs-fMRI FC scalar)."
+    blocks: [BEH, EEG, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC]
+
+  - id: "02b"
+    name: dti_pred_oof
+    parent: "01b"
+    source_commit: addendum_1
+    pre_audit_val_mae: null
+    note: "Adds DL_DTI_OOF_AGE (predicted_age scalar from external 90-ROI DTI ridge OOF). Tests whether the scalar carries information beyond the DTI_ROI block already in baseline."
+    blocks: [BEH, EEG, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC, DL_DTI_OOF_AGE]
+
+  - id: "03b"
+    name: dti_voxel_ridge
+    parent: "02b"
+    source_commit: addendum_1
+    pre_audit_val_mae: null
+    note: "Adds 3 voxel-level DTI ridge OOFs (FA, MD, FA+MD) from 130k TBSS voxels."
+    blocks: [BEH, EEG, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE]
+
+  - id: "04b"
+    name: eeg_psd_raw
+    parent: "03b"
+    source_commit: addendum_1
+    pre_audit_val_mae: null
+    note: "Adds 150 EEG PSD log-band-powers (30ch x 5 bands) directly to EEG block, alongside microstates + IAF + task-EEG features already present in the 509-col baseline EEG."
+    blocks: [BEH, EEG, EEG_PSD_RAW, MRI, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE]
+
+  - id: "05b"
+    name: drop_fa_cortical_sensitivity
+    parent: "04b"
+    source_commit: addendum_1
+    pre_audit_val_mae: null
+    note: "Sensitivity check: swap MRI for MRI_drop_fa_cortical (drop 172 STRUCTURE_*_FA cortical-projection cols). Not an information-gain claim; a cleanliness operation."
+    blocks: [BEH, EEG, EEG_PSD_RAW, MRI_drop_fa_cortical, DTI_ROI, DL_SFCN, DL_PYMENT, DL_RSFMRI_FC, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE]

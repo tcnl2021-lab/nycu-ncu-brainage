@@ -1,0 +1,137 @@
+# Frontier configs to replay under the clean audit protocol.
+#
+# Source: extracted ONCE from
+#   /media/DATA3/Quanta/codes/brain_age_2026/tuning/results.tsv
+# during the freeze step (see preregister.md §10). After this file was
+# written, results.tsv is off-limits to all audit scripts.
+#
+# Each config defines a feature stack as a set of `blocks`. Under the clean
+# protocol every block contributes one outer-fold-aligned RidgeCV OOF column;
+# those columns are stacked and fed to a RidgeCV meta + RidgeCV residual; no
+# clip is applied (preregister §8 Option A).
+#
+# Block vocabulary (declared in scripts/train_clean.py):
+#   BEH                       — cache X_beh + SEX (200 cols)
+#   EEG                       — cache X_eeg (509 cols)
+#   EEG_PSD_RAW               — 150 PSD log-band-powers from
+#                               Data/DL_features/eeg_psd_features.csv,
+#                               concatenated to the EEG block (eeg_psd_raw step)
+#   MRI                       — cache X_mri inflated back to 1266 cols by
+#                               re-introducing 172 STRUCTURE_*_FA cortical
+#                               projections from the source CSV
+#   MRI_drop_fa_cortical      — same as MRI but with the 172 FA-cortical cols
+#                               removed (drop_fa_cortical step)
+#   DL_SFCN                   — Data/DL_features/sfcn_features.csv
+#   DL_PYMENT                 — Data/DL_features/pyment_features.csv
+#   DL_DTI_OOF_AGE            — predicted_age column from
+#                               GripForce/analysis/brainage/cv_predictions.csv
+#   DL_DTI_VOXEL_RIDGE        — three OOF columns from
+#                               Data/DL_features/dti_voxel_ridge_oof.csv
+#   DL_RSFMRI_FC              — rsfmri_fc_ridge OOF scalar from
+#                               Data/DL_features/rsfmri_fc_oof.csv
+#   DTI_ROI                   — 90 JHU ROI features from
+#                               GripForce/analysis/brainage/features_roi.csv
+#
+# Several frontier steps in the original pipeline added *engineering* on top of
+# already-present blocks (composite groups, per-feature transforms, cross-mod
+# composite groupings) without introducing a new information channel. Under
+# the clean protocol — which uses only block-level RidgeCV → RidgeCV stacking
+# and deliberately omits the bespoke composite/transform machinery of train.py
+# — those steps are no-ops by construction. They are still included in the
+# replay so the verdict is recorded explicitly. Affected configs are flagged
+# with `no_new_information: true` below.
+#
+# clean_protocol_caveat: this audit replays the *information content* of each
+# frontier step under a uniform clean stacker, not train.py's full
+# feature-engineering machinery. Absolute MAE values therefore differ from
+# results.tsv. The audit's question is "would each step's marginal
+# improvement still be detected under leakage-free preprocessing?", not
+# "can we reproduce results.tsv to the third decimal?".
+
+configs:
+  - id: "01"
+    name: pyment_baseline
+    parent: null
+    source_commit: 9e941fd
+    pre_audit_val_mae: 2.967299
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT]
+
+  - id: "02"
+    name: dti_int1
+    parent: "01"
+    source_commit: dti_int1
+    pre_audit_val_mae: 2.929198
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI]
+
+  - id: "03"
+    name: dti_int2
+    parent: "02"
+    source_commit: dti_int2
+    pre_audit_val_mae: 2.921220
+    no_new_information: true
+    note: "Adds DTI columns to composite-group machinery only; no new feature block."
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI]
+
+  - id: "04"
+    name: dti_int5
+    parent: "03"
+    source_commit: dti_int5
+    pre_audit_val_mae: 2.882532
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE]
+
+  - id: "05"
+    name: dti_int6
+    parent: "04"
+    source_commit: dti_int6
+    pre_audit_val_mae: 2.880451
+    no_new_information: true
+    note: "Adds log/sqrt/sq transforms on DTI MD columns only; no new feature block."
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE]
+
+  - id: "06"
+    name: dti_int8
+    parent: "05"
+    source_commit: dti_int8
+    pre_audit_val_mae: 2.870983
+    no_new_information: true
+    note: "Adds DTI x MRI-WM cross-modality composite groups only; no new feature block."
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE]
+
+  - id: "07"
+    name: dti_int_final
+    parent: "06"
+    source_commit: dti_int_final
+    pre_audit_val_mae: 2.870983
+    no_new_information: true
+    note: "Re-verification of the DTI block with no new feature inputs."
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE]
+
+  - id: "08"
+    name: dti_voxel_ridge
+    parent: "07"
+    source_commit: dti_voxel_ridge
+    pre_audit_val_mae: 2.807810
+    blocks: [BEH, EEG, MRI, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE]
+
+  - id: "09"
+    name: drop_fa_cortical
+    parent: "08"
+    source_commit: drop_fa_cortical
+    pre_audit_val_mae: 2.819018
+    note: "Drops 172 STRUCTURE_*_FA cortical-projection cols from MRI block."
+    blocks: [BEH, EEG, MRI_drop_fa_cortical, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE]
+
+  - id: "10"
+    name: eeg_psd_raw
+    parent: "09"
+    source_commit: eeg_psd_raw
+    pre_audit_val_mae: 2.814367
+    note: "Appends 150 PSD log-band-powers directly to EEG block."
+    blocks: [BEH, EEG, EEG_PSD_RAW, MRI_drop_fa_cortical, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE]
+
+  - id: "11"
+    name: rsfmri_fc_oof
+    parent: "10"
+    source_commit: rsfmri_fc_oof
+    pre_audit_val_mae: 2.806689
+    blocks: [BEH, EEG, EEG_PSD_RAW, MRI_drop_fa_cortical, DL_SFCN, DL_PYMENT, DTI_ROI, DL_DTI_OOF_AGE, DL_DTI_VOXEL_RIDGE, DL_RSFMRI_FC]
