@@ -126,7 +126,7 @@ jobs:
         echo "All required files, dependencies, and configurations present."
         echo ""
         echo "To reproduce the analysis:"
-        echo "  1. Download feature data from OSF (https://doi.org/[OSF_DOI])"
+        echo "  1. Download feature data from OSF (https://doi.org/10.17605/OSF.IO/8UZVQ)"
         echo "  2. conda env create -f environment.yml"
         echo "  3. python scripts/audit_replay.py --config configs/frontier_addendum_1.yaml"
         echo ""

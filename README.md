@@ -1,6 +1,6 @@
 # NYCU-NCU Brain-Age Prediction: Analysis Scripts and Outputs
 
-[![DOI](https://zenodo.org/badge/[ZENODO_ID].svg)](https://zenodo.org/badge/latestdoi/[ZENODO_ID])
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20032236.svg)](https://doi.org/10.5281/zenodo.20032236)
 
 Analysis pipeline and pre-computed outputs for the NYCU-NCU brain-age prediction study.
 
@@ -22,7 +22,7 @@ This repository contains the **clean-protocol analysis stack** and all pre-compu
 
 ### 1. Get the Feature Data
 
-Download from **OSF** (https://doi.org/[OSF_DOI]):
+Download from **OSF** (https://doi.org/10.17605/OSF.IO/8UZVQ):
 
 **Restricted access** (approved via data access form):
 - `DATA_ses-01_cleaned.csv` — All 427 × 2,121 features (demographics, behavioral, EEG, sMRI, task-fMRI)
@@ -380,12 +380,13 @@ If you use these scripts or outputs, please cite:
   doi     = {[DOI]}
 }
 
-@software{chang2025brainage_code,
+@software{chang2026brainage_code,
   title   = {NYCU-NCU brain-age prediction: analysis scripts and outputs},
   author  = {Chang, E.},
-  year    = {2025},
+  year    = {2026},
+  version = {v1.0.0},
   url     = {https://github.com/tcnl2021-lab/nycu-ncu-brainage},
-  doi     = {10.5281/zenodo.[ZENODO_ID]}
+  doi     = {10.5281/zenodo.20032236}
 }
 ```
 
@@ -393,7 +394,7 @@ If you use these scripts or outputs, please cite:
 
 ## Related Resources
 
-- **Feature data:** https://doi.org/[OSF_DOI] (OSF project)
+- **Feature data:** https://doi.org/10.17605/OSF.IO/8UZVQ (OSF project)
 - **SFCN weights:** https://github.com/ha-ha-ha-han/UKBiobank_deep_pretrain
 - **Pyment weights:** https://github.com/estenhl/pyment-public
 - **Pre-registration:** See `preregister_folds.sha256` and fold hash verification
@@ -414,8 +415,8 @@ Pre-trained model weights (SFCN, Pyment) retain their original licenses.
 
 For questions about the analysis, code, or pre-computed outputs, open an issue on GitHub.
 
-For data access requests, visit the OSF project: https://doi.org/[OSF_DOI]
+For data access requests, visit the OSF project: https://doi.org/10.17605/OSF.IO/8UZVQ
 
 ---
 
-**Last updated:** 2026-05-02
+**Last updated:** 2026-05-05
